@@ -1,0 +1,224 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.88);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: scaleIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.container::-webkit-scrollbar { display: none; }
+
+@keyframes scaleIn {
+  from { transform: scale(0.88) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.closeBtn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(201, 168, 226, 0.15);
+  border: 1px solid rgba(201, 168, 226, 0.3);
+  color: rgba(201, 168, 226, 0.7);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+  line-height: 1;
+}
+.closeBtn:hover {
+  background: rgba(201, 168, 226, 0.25);
+}
+
+.receipt {
+  width: min(380px, 90vw);
+  background: #FAFAF7;
+  padding: 28px 28px 0;
+  position: relative;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.7);
+}
+
+/* Top serrated */
+.serratedTop {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 100%;
+  height: 9px;
+  background:
+    radial-gradient(circle at 6px 9px, #0a0a0a 6px, #FAFAF7 6px) 0 0 / 11px 9px,
+    #FAFAF7;
+}
+
+/* Bottom serrated */
+.serratedBottom {
+  width: calc(100% + 56px);
+  margin-left: -28px;
+  height: 9px;
+  margin-top: 20px;
+  background:
+    radial-gradient(circle at 6px 0, #0a0a0a 6px, #FAFAF7 6px) 0 0 / 11px 9px,
+    #FAFAF7;
+}
+
+.brand {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 26px;
+  color: #1a1a1a;
+  display: block;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #bbb;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.divider {
+  height: 0.5px;
+  background: #e8e8e8;
+  margin-bottom: 14px;
+}
+
+.dash {
+  border-top: 1px dashed #e0e0e0;
+  margin: 14px 0;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #ccc;
+  letter-spacing: 0.04em;
+}
+
+.quoteWrap {
+  text-align: center;
+  padding: 10px 4px;
+}
+
+.stars {
+  font-size: 12px;
+  color: #c9a8e2;
+  letter-spacing: 5px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.qMain {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 28px;
+  font-weight: 300;
+  color: #111;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+
+.qLine {
+  width: 40px;
+  height: 0.5px;
+  background: #c9a8e2;
+  margin: 0 auto 12px;
+}
+
+.qSub {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #777;
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0 16px;
+}
+
+.code {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #ccc;
+  letter-spacing: 0.14em;
+}
+
+/* Save button */
+.saveBtn {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #c9a8e2;
+  background: transparent;
+  border: 1px solid rgba(201, 168, 226, 0.543);
+  padding: 13px 32px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  text-transform: lowercase;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: rgba(201, 168, 226, 0.12);
+  border-color: rgba(201, 168, 226, 0.7);
+}
+
+.saveBtnSaved {
+  color: rgb(201, 168, 226);
+  border-color: rgba(201, 168, 226, 0.2);
+  cursor: default;
+}
+
+.savingDots {
+  animation: pulse 0.8s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

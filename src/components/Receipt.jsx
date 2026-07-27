@@ -1,4 +1,5 @@
 import Barcode from "./Barcode.jsx";
+import TearGesture from "./TearGesture.jsx";
 import styles from "./Receipt.module.css";
 
 function fmtDate() {
@@ -8,12 +9,22 @@ function fmtTime() {
   return new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function Receipt({ open, quote, mood, moodLabel, code, quoteVisible }) {
+export default function Receipt({
+  open,
+  quote,
+  mood,
+  moodLabel,
+  code,
+  quoteVisible,
+  printed,
+  torn,
+  onTear,
+}) {
   return (
     <div
       className={styles.wrap}
       style={{
-        height: open ? "395px" : "0",   /* era 240px */
+        height: open ? "400px" : "0",
         opacity: open ? 1 : 0,
         transition: "height 0.8s cubic-bezier(0.22,1,0.36,1), opacity 0.4s",
       }}
@@ -59,6 +70,11 @@ export default function Receipt({ open, quote, mood, moodLabel, code, quoteVisib
           <Barcode />
           <p className={styles.code}>{code}</p>
         </div>
+
+        {/* strappa per aprire la ricevuta a schermo intero */}
+        {printed && !torn && (
+          <TearGesture onTear={onTear} disabled={!quoteVisible} />
+        )}
       </div>
     </div>
   );

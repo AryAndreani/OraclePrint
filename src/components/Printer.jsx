@@ -6,14 +6,13 @@ const PRINTER_W = 350;
 const PRINTER_H = 446;
 
 const SCREEN = {
-  left:   54,    
-  top:    90,    
-  width:  245,   
-  height: 270,   
-}; 
+  left:   54,
+  top:    90,
+  width:  245,
+  height: 270,
+};
 
-
-export default function Printer({ status, printed, onSelect, printing }) {
+export default function Printer({ status, printed, onSelect, printing, onReset }) {
   return (
     <div style={{ position: "relative", width: `${PRINTER_W}px`, flexShrink: 0 }}>
       <img
@@ -37,29 +36,36 @@ export default function Printer({ status, printed, onSelect, printing }) {
           height: SCREEN.height,
         }}
       >
-        <p className={`${styles.statusLabel} ${
-          status === "printing" ? styles.statusPrinting :
-          status === "ready"    ? styles.statusReady    :
-                                  styles.statusIdle
-        }`}>
-          {status === "printing" ? "PRINTING..." :
-           status === "ready"    ? "READY  ✓"    :
-                                   "CHOOSE YOUR MOOD"}
-        </p>
+        {!printed ? (
+          <>
+            <p className={`${styles.statusLabel} ${
+              status === "printing" ? styles.statusPrinting : styles.statusIdle
+            }`}>
+              {status === "printing" ? "PRINTING..." : "CHOOSE YOUR MOOD"}
+            </p>
 
-        {!printed && (
-          <div className={styles.moodGrid}>
-            {MOODS.map((m) => (
-              <button
-                key={m.id}
-                className={styles.moodBtn}
-                onClick={() => onSelect(m.id)}
-                disabled={printing}
-              >
-                <span className={styles.emoji}>{m.emoji}</span>
-                <span className={styles.label}>{m.label}</span>
-              </button>
-            ))}
+            <div className={styles.moodGrid}>
+              {MOODS.map((m) => (
+                <button
+                  key={m.id}
+                  className={styles.moodBtn}
+                  onClick={() => onSelect(m.id)}
+                  disabled={printing}
+                >
+                  <span className={styles.emoji}>{m.emoji}</span>
+                  <span className={styles.label}>{m.label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className={styles.printAgainWrap}>
+            <p className={`${styles.statusLabel} ${styles.statusReady}`}>
+              READY  ✓
+            </p>
+            <button className={styles.printAgainBtn} onClick={onReset}>
+              print another
+            </button>
           </div>
         )}
       </div>
