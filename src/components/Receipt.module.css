@@ -1,0 +1,127 @@
+.wrap {
+  width: 340px;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+}
+
+.receipt {
+  width: 340px;
+  background: #FAFAF7;
+  padding: 22px 22px 18px;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+}
+
+/* serrated bottom edge */
+.serrated {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 340px;
+  height: 9px;
+  background:
+    radial-gradient(circle at 6px 0, #0a0a0a 6px, #FAFAF7 6px) 0 0 / 11px 9px,
+    #FAFAF7;
+}
+
+.brand {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: #1a1a1a;
+  display: block;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #bbb;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.divider {
+  height: 0.5px;
+  background: #e8e8e8;
+  margin-bottom: 12px;
+}
+
+.dash {
+  border-top: 1px dashed #e0e0e0;
+  margin: 12px 0;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #ccc;
+  letter-spacing: 0.04em;
+}
+
+.quoteWrap {
+  text-align: center;
+  padding: 8px 4px;
+  transition: opacity 0.4s ease, transform 0.4s ease;  /* era 0.9s */
+}
+
+.stars {
+  font-size: 11px;
+  color: #c9a8e2;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.qMain {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 300;
+  color: #111;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.qLine {
+  width: 40px;
+  height: 0.5px;
+  background: #c9a8e2;
+  margin: 0 auto 10px;
+}
+
+.qSub {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #777;
+  line-height: 1.45;
+  letter-spacing: 0.03em;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.code {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #ccc;
+  letter-spacing: 0.14em;
+}
