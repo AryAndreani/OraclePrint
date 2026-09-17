@@ -4,7 +4,7 @@ import Printer from "./components/Printer.jsx";
 import ReceiptFullscreen from "./components/ReceiptFullscreen.jsx";
 import FavoritesTab from "./components/Favoritestab.jsx";
 import LoginModal from "./components/LoginModal.jsx";
-import AccountModal from "./components/Accountmodal.jsx";
+import AccountModal from "./components/AccountModal.jsx";
 import { useAuth } from "./hooks/useAuth.js";
 import { supabase } from "./supabaseClient.js";
 import { QUOTES, MOOD_LABELS } from "./quotes.js";
