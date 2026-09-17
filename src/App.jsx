@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import Receipt from "./components/Receipt.jsx";
 import Printer from "./components/Printer.jsx";
 import ReceiptFullscreen from "./components/ReceiptFullscreen.jsx";
-import FavoritesTab from "./components/Favoritestab.jsx";
+import FavoritesTab from "./components/FavoritesTab.jsx";
 import LoginModal from "./components/LoginModal.jsx";
 import AccountModal from "./components/AccountModal.jsx";
 import { useAuth } from "./hooks/useAuth.js";
