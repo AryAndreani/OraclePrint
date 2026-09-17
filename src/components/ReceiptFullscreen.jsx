@@ -9,18 +9,22 @@ function fmtTime() {
   return new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function ReceiptFullscreen({ quote, mood, moodLabel, code, onClose, onSave, alreadySaved }) {
-  const receiptRef = useRef(null);
+export default function ReceiptFullscreen({
+  quote, mood, moodLabel, code, onClose, onSave, alreadySaved, isLoggedIn, onRequireLogin,
+}) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(alreadySaved);
 
   const handleSave = async () => {
     if (saved || saving) return;
+
+    if (!isLoggedIn) {
+      onRequireLogin();
+      return;
+    }
+
     setSaving(true);
-
-    await new Promise(r => setTimeout(r, 350));
-
-    onSave({ quote, mood, moodLabel, code, date: fmtDate(), time: fmtTime() });
+    await onSave({ quote, mood, moodLabel, code, date: fmtDate(), time: fmtTime() });
     setSaved(true);
     setSaving(false);
   };
@@ -28,16 +32,10 @@ export default function ReceiptFullscreen({ quote, mood, moodLabel, code, onClos
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.container} onClick={e => e.stopPropagation()}>
-        {/* Close */}
-        <button className={styles.closeBtn} onClick={onClose} aria-label="Chiudi">
-          ✕
-        </button>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
 
-        {/* Receipt paper */}
-        <div ref={receiptRef} className={styles.receipt}>
-          {/* Top serrated edge */}
+        <div className={styles.receipt}>
           <div className={styles.serratedTop} />
-
           <span className={styles.brand}>Oracle Print</span>
           <p className={styles.sub}>daily receipt</p>
           <div className={styles.divider} />
@@ -67,11 +65,9 @@ export default function ReceiptFullscreen({ quote, mood, moodLabel, code, onClos
             <p className={styles.code}>{code}</p>
           </div>
 
-          {/* Bottom serrated edge */}
           <div className={styles.serratedBottom} />
         </div>
 
-        {/* Save button */}
         <button
           className={`${styles.saveBtn} ${saved ? styles.saveBtnSaved : ""}`}
           onClick={handleSave}

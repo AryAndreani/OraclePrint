@@ -56,7 +56,7 @@ export default function TearGesture({ onTear, disabled }) {
       onTouchEnd={handleEnd}
       style={{ cursor: disabled ? "default" : "grab" }}
       role="button"
-      aria-label="Scorri per aprire lo scontrino"
+      aria-label="Swipe to open the receipt"
       tabIndex={disabled ? -1 : 0}
     >
       {/* Dashed tear line */}
@@ -80,7 +80,7 @@ export default function TearGesture({ onTear, disabled }) {
 
       {/* Hint text */}
       {dragX === null && (
-        <span className={styles.hint}>Scroll to rip the receipt</span>
+        <span className={styles.hint}>Swipe to rip the receipt</span>
       )}
     </div>
   );

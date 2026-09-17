@@ -32,8 +32,8 @@ export default function FavoritesTab({ favorites, onOpen, onRemove }) {
     return (
       <div className={styles.empty}>
         <span className={styles.emptyIcon}>♡</span>
-        <p className={styles.emptyTitle}>nessun preferito ancora</p>
-        <p className={styles.emptyNote}>scorri lo scontrino e salvalo qui</p>
+        <p className={styles.emptyTitle}>no favorites yet</p>
+        <p className={styles.emptyNote}>swipe the receipt and save it here</p>
       </div>
     );
   }
@@ -46,7 +46,7 @@ export default function FavoritesTab({ favorites, onOpen, onRemove }) {
           <button
             className={styles.removeBtn}
             onClick={() => onRemove(item.code)}
-            aria-label="Rimuovi dai preferiti"
+            aria-label="Remove from favorites"
           >
             ✕
           </button>

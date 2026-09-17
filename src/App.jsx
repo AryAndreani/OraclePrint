@@ -2,30 +2,34 @@ import { useState, useCallback, useEffect } from "react";
 import Receipt from "./components/Receipt.jsx";
 import Printer from "./components/Printer.jsx";
 import ReceiptFullscreen from "./components/ReceiptFullscreen.jsx";
-import FavoritesTab from "./components/FavoritesTab.jsx";
+import FavoritesTab from "./components/Favoritestab.jsx";
+import LoginModal from "./components/LoginModal.jsx";
+import AccountModal from "./components/Accountmodal.jsx";
+import { useAuth } from "./hooks/useAuth.js";
+import { supabase } from "./supabaseClient.js";
 import { QUOTES, MOOD_LABELS } from "./quotes.js";
 import styles from "./App.module.css";
+import ResetPasswordModal from "./components/ResetPasswordModal.jsx";
 
 function rnd(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-
 function genCode() {
   return Math.random().toString(36).substring(2, 10).toUpperCase();
 }
 
-const FAVORITES_KEY = "oracle-print-favorites";
-
-function loadFavorites() {
-  try {
-    const raw = localStorage.getItem(FAVORITES_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
 export default function App() {
+  const {
+    user,
+    loading: authLoading,
+    signInWithPassword,
+    signUpWithPassword,
+    signOut,
+    resetPasswordForEmail,
+    updatePassword,
+    isPasswordRecovery,
+    cancelPasswordRecovery,
+  } = useAuth();
   const [status, setStatus]             = useState("idle");
   const [quote, setQuote]               = useState(null);
   const [mood, setMood]                 = useState(null);
@@ -35,16 +39,54 @@ export default function App() {
   const [code, setCode]                 = useState(genCode);
   const [torn, setTorn]                 = useState(false);
 
-  const [tab, setTab]                     = useState("printer"); // "printer" | "favorites"
-  const [favorites, setFavorites]         = useState(loadFavorites);
+  const [tab, setTab]                       = useState("printer");
+  const [favorites, setFavorites]           = useState([]);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [fullscreenItem, setFullscreenItem] = useState(null);
-
-  useEffect(() => {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-  }, [favorites]);
+  const [loginOpen, setLoginOpen]           = useState(false);
+  const [accountOpen, setAccountOpen]       = useState(false);
+  const [pendingAction, setPendingAction]   = useState(null); // "save" | "favorites" | null
 
   const printing = status === "printing";
+
+  // carica i preferiti da Supabase quando l'utente è loggato
+  useEffect(() => {
+    if (!user) {
+      setFavorites([]);
+      return;
+    }
+    setFavoritesLoading(true);
+    supabase
+      .from("favorites")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setFavorites(
+            data.map((f) => ({
+              id: f.id,
+              code: f.code,
+              mood: f.mood,
+              moodLabel: f.mood_label,
+              quote: { m: f.quote_m, s: f.quote_s },
+              date: f.date,
+              time: f.time,
+            }))
+          );
+        }
+        setFavoritesLoading(false);
+      });
+  }, [user]);
+
+  // se l'utente si è appena loggato mentre voleva salvare/aprire i preferiti, esegui l'azione
+  useEffect(() => {
+    if (user && loginOpen) {
+      setLoginOpen(false);
+      if (pendingAction === "favorites") setTab("favorites");
+      setPendingAction(null);
+    }
+  }, [user, loginOpen, pendingAction]);
 
   const selectMood = useCallback((m) => {
     if (printing) return;
@@ -80,14 +122,35 @@ export default function App() {
     setFullscreenOpen(true);
   }, [quote, mood, code]);
 
-  const addFavorite = useCallback((item) => {
-    setFavorites((prev) =>
-      prev.some((f) => f.code === item.code) ? prev : [item, ...prev]
-    );
-  }, []);
+  const addFavorite = useCallback(async (item) => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("favorites")
+      .insert({
+        user_id: user.id,
+        code: item.code,
+        mood: item.mood,
+        mood_label: item.moodLabel,
+        quote_m: item.quote.m,
+        quote_s: item.quote.s,
+        date: item.date,
+        time: item.time,
+      })
+      .select()
+      .single();
 
-  const removeFavorite = useCallback((codeToRemove) => {
-    setFavorites((prev) => prev.filter((f) => f.code !== codeToRemove));
+    if (!error && data) {
+      setFavorites((prev) => [
+        { id: data.id, code: data.code, mood: data.mood, moodLabel: data.mood_label,
+          quote: { m: data.quote_m, s: data.quote_s }, date: data.date, time: data.time },
+        ...prev,
+      ]);
+    }
+  }, [user]);
+
+  const removeFavorite = useCallback(async (idToRemove) => {
+    await supabase.from("favorites").delete().eq("id", idToRemove);
+    setFavorites((prev) => prev.filter((f) => f.id !== idToRemove));
   }, []);
 
   const openFavorite = useCallback((item) => {
@@ -96,6 +159,22 @@ export default function App() {
   }, []);
 
   const closeFullscreen = useCallback(() => setFullscreenOpen(false), []);
+
+  // gestione tab: se clicca "favorites" senza login, apri il login
+  const handleTabClick = (id) => {
+    if (id === "favorites" && !user) {
+      setPendingAction("favorites");
+      setLoginOpen(true);
+      return;
+    }
+    setTab(id);
+  };
+
+  // gestione save: se clicca "save" senza login, apri il login
+  const handleRequireLogin = () => {
+    setPendingAction("save");
+    setLoginOpen(true);
+  };
 
   const fullscreenAlreadySaved =
     !!fullscreenItem && favorites.some((f) => f.code === fullscreenItem.code);
@@ -107,7 +186,6 @@ export default function App() {
       <p className={styles.tagline}>your personal fortune printer</p>
       <h1 className={styles.title}>Oracle Print</h1>
 
-      {/* tab nav */}
       <div style={{ display: "flex", gap: "8px", marginBottom: "24px", position: "relative", zIndex: 1 }}>
         {[
           { id: "printer", label: "printer" },
@@ -115,7 +193,7 @@ export default function App() {
         ].map((t) => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => handleTabClick(t.id)}
             style={{
               fontFamily: "'DM Mono', monospace",
               fontSize: "10px",
@@ -132,6 +210,35 @@ export default function App() {
             {t.label}
           </button>
         ))}
+
+        {user && (
+          <button
+            onClick={() => setAccountOpen(true)}
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "10px",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              padding: "8px 14px",
+              borderRadius: "100px",
+              border: "1px solid rgba(201,168,226,0.2)",
+              background: "transparent",
+              color: "rgba(201,168,226,0.45)",
+              cursor: "pointer",
+              transition: "border-color 0.2s, color 0.2s",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "rgba(201,168,226,0.5)";
+              e.currentTarget.style.color = "rgba(201,168,226,0.75)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "rgba(201,168,226,0.2)";
+              e.currentTarget.style.color = "rgba(201,168,226,0.45)";
+            }}
+          >
+            account
+          </button>
+        )}
       </div>
 
       {tab === "printer" ? (
@@ -170,6 +277,7 @@ export default function App() {
           favorites={favorites}
           onOpen={openFavorite}
           onRemove={removeFavorite}
+          loading={favoritesLoading}
         />
       )}
 
@@ -182,6 +290,32 @@ export default function App() {
           onClose={closeFullscreen}
           onSave={addFavorite}
           alreadySaved={fullscreenAlreadySaved}
+          isLoggedIn={!!user}
+          onRequireLogin={handleRequireLogin}
+        />
+      )}
+
+      {loginOpen && (
+        <LoginModal
+          onClose={() => setLoginOpen(false)}
+          signInWithPassword={signInWithPassword}
+          signUpWithPassword={signUpWithPassword}
+          resetPasswordForEmail={resetPasswordForEmail}
+        />
+      )}
+
+      {accountOpen && user && (
+        <AccountModal
+          user={user}
+          onClose={() => setAccountOpen(false)}
+          onSignOut={signOut}
+        />
+      )}
+
+      {isPasswordRecovery && (
+        <ResetPasswordModal
+          onClose={cancelPasswordRecovery}
+          updatePassword={updatePassword}
         />
       )}
 
