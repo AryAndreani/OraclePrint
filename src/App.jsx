@@ -4,12 +4,12 @@ import Printer from "./components/Printer.jsx";
 import ReceiptFullscreen from "./components/ReceiptFullscreen.jsx";
 import FavoritesTab from "./components/FavoritesTab.jsx";
 import LoginModal from "./components/LoginModal.jsx";
-import AccountModal from "./components/AccountModal.jsx";
 import { useAuth } from "./hooks/useAuth.js";
 import { supabase } from "./supabaseClient.js";
 import { QUOTES, MOOD_LABELS } from "./quotes.js";
 import styles from "./App.module.css";
 import ResetPasswordModal from "./components/ResetPasswordModal.jsx";
+import PrivacyPolicy from "./components/PrivacyPolicy.jsx";
 
 function rnd(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -45,8 +45,8 @@ export default function App() {
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [fullscreenItem, setFullscreenItem] = useState(null);
   const [loginOpen, setLoginOpen]           = useState(false);
-  const [accountOpen, setAccountOpen]       = useState(false);
   const [pendingAction, setPendingAction]   = useState(null); // "save" | "favorites" | null
+  const [privacyOpen, setPrivacyOpen]       = useState(false);
 
   const printing = status === "printing";
 
@@ -213,7 +213,7 @@ export default function App() {
 
         {user && (
           <button
-            onClick={() => setAccountOpen(true)}
+            onClick={signOut}
             style={{
               fontFamily: "'DM Mono', monospace",
               fontSize: "10px",
@@ -221,22 +221,13 @@ export default function App() {
               textTransform: "uppercase",
               padding: "8px 14px",
               borderRadius: "100px",
-              border: "1px solid rgba(201,168,226,0.2)",
+              border: "1px solid rgba(255,255,255,0.1)",
               background: "transparent",
-              color: "rgba(201,168,226,0.45)",
+              color: "rgba(255,255,255,0.3)",
               cursor: "pointer",
-              transition: "border-color 0.2s, color 0.2s",
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = "rgba(201,168,226,0.5)";
-              e.currentTarget.style.color = "rgba(201,168,226,0.75)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = "rgba(201,168,226,0.2)";
-              e.currentTarget.style.color = "rgba(201,168,226,0.45)";
             }}
           >
-            account
+            logout
           </button>
         )}
       </div>
@@ -304,14 +295,6 @@ export default function App() {
         />
       )}
 
-      {accountOpen && user && (
-        <AccountModal
-          user={user}
-          onClose={() => setAccountOpen(false)}
-          onSignOut={signOut}
-        />
-      )}
-
       {isPasswordRecovery && (
         <ResetPasswordModal
           onClose={cancelPasswordRecovery}
@@ -319,7 +302,17 @@ export default function App() {
         />
       )}
 
-      <footer className={styles.footer}>oracle print © {new Date().getFullYear()}</footer>
+      <footer className={styles.footer}>
+        <span>oracle print © {new Date().getFullYear()}</span>
+        <span className={styles.footerDot}>·</span>
+        <button className={styles.footerLink} onClick={() => setPrivacyOpen(true)}>
+          privacy policy
+        </button>
+      </footer>
+
+      {privacyOpen && (
+        <PrivacyPolicy onClose={() => setPrivacyOpen(false)} />
+      )}
     </div>
   );
 }
