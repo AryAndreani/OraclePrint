@@ -7,21 +7,6 @@ Your personal fortune printer — a mood-based motivational receipt app.
 - CSS Modules
 - Google Fonts: Playfair Display, DM Mono, Cormorant Garamond
 
-## Setup
-
-```bash
-npm install
-npm run dev
-```
-
-## Build & deploy
-
-```bash
-npm run build
-# → dist/ folder ready to deploy on Netlify / Vercel
-```
-
-Just drag the `dist/` folder into Netlify Drop and you're live.
 
 ## Project structure
 
